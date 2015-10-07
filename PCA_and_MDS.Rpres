@@ -1,0 +1,218 @@
+Conceptual overview: Principal Components Analysis (PCA)
+========================================================
+author: Julin Maloof
+date: 
+
+Principal Components Analysis: motivation
+========================================================
+
+Often a data set consists of many different variables.
+
+Principal Components Analysis (PCA) provides a way to focus on the most important aspects of the data.
+
+Just as the name says, it determines the Principal Components of the data set.
+
+Principal components in genomics
+========================================================
+
+One major use of PCA in genomics is to simplify complex SNP data sets.
+
+Consider a data set of two markers, M1 (A/G) and M2 (C/T).  We can make a graphical representation of these markers by assigning numeric values to each genotype at each marker.
+
+| M1   | M2  |
+|------|-----|
+|AA: 0 |CC: 0|
+|AG: 1 |CT: 1|
+|GG: 2 |TT: 2|
+
+Principal components in genomics
+========================================================
+
+| M1   | M2  |
+|------|-----|
+|AA: 0 |CC: 0|
+|AG: 1 |CT: 1|
+|GG: 2 |TT: 2|
+
+***
+We can then plot each individual's genotypes on a 2D scatter plot:
+
+```{r 2Dplot, echo=FALSE}
+#in this data set we have a strong correlation between M1 and M2
+library(ggplot2)
+library(grid)
+data2D <- data.frame(
+  M1=sample(c("AA","AG","GG"),size=200,prob=c(0.25,0.5,0.25),replace=TRUE)
+)
+data2D$M2 <- factor(sapply(as.character(data2D$M1), 
+  switch,
+    AA = "TT", 
+    AG = "CT", 
+    GG = "CC"
+  )
+)
+
+pl <- ggplot(data2D,aes(x=M1,y=M2))
+pl <- pl + geom_point(position=position_jitter(width=.1,height=.1)) + theme(axis.title = element_text(size=20), axis.text = element_text(size=20))    
+pl
+```
+
+Principal components in genomics
+========================================================
+
+Can we draw a vector through the area of the plot with the largest variance (i.e. the largest spread of data)?
+
+
+```{r, echo=FALSE}
+pl
+```
+
+Principal components in genomics
+========================================================
+
+The first principal component represents the axis the contains the largest variance in the data:
+
+
+```{r, echo=FALSE}
+pl + geom_segment(aes(x="AA",xend="GG",y="TT",yend="CC"),color="skyblue",size=2,arrow=arrow(ends="both",length=unit(.1,"native")))
+```
+
+Principal components in genomics
+========================================================
+
+In this data set the second principal component contains no information.
+
+```{r, echo=FALSE}
+pl + geom_segment(aes(x="AA",xend="GG",y="TT",yend="CC"),color="skyblue",size=2,arrow=arrow(ends="both",length=unit(.1,"native")))
+```
+
+Principal components in genomics
+========================================================
+
+Consider a new marker, M3:
+
+```{r, echo=FALSE}
+data2D$M3 <- data2D$M2
+data2D$M3[1:190] <- factor(sapply(as.character(data2D$M2[1:190]), 
+  switch,
+    TT = "CC", 
+    CT = "CT",
+    CC = "TT"
+  )
+)
+pl2 <- ggplot(data2D,aes(x=M1,y=M3))
+pl2 <- pl2 + geom_point(position=position_jitter(width=.1,height=.1)) + theme(axis.title = element_text(size=20), axis.text = element_text(size=20))    
+pl2
+```
+
+Principal components in genomics
+========================================================
+
+Where are the first and second principal components here?
+
+```{r, echo=FALSE}
+pl2
+```
+
+Principal components in genomics
+========================================================
+
+Where are the first and second principal components here?
+
+```{r, echo=FALSE}
+pl2 + geom_segment(aes(x="AA",xend="GG",y="CC",yend="TT"),color="skyblue",size=2,arrow=arrow(ends="both",length=unit(.1,"native"))) +
+  geom_segment(aes(x=1.5,xend=2.5,y=2.5,yend=1.5),color="red",size=1,arrow=arrow(ends="both",length=unit(.1,"native")))
+  
+```
+
+Three SNPs--First View
+========================================================
+
+What about if there are 3 SNPs?  
+Now our data is 3D and we have to plot in 3D.
+
+Changing rotation alters our interpretation of the data.
+
+In this view it appears that most of the variance in along a single vector.
+
+***
+
+![first view](3D_SNPs_1.png)
+
+```{r, echo=FALSE, eval=FALSE}
+library(rgl)
+library(scatterplot3d)
+data3D <- data.matrix(data2D)-1
+data3D[,"M2"] <- sample(0:2,size = nrow(data3D), prob=c(.25,.5,.25), replace=TRUE)
+#data3D <- data3D[,c(1,3,2)] # plots better in this order
+data3D <- data3D + runif(n = nrow(data3D)*ncol(data3D),-.1,.1)
+
+#plot3d(data3D)
+plot3d(data3D,axes=F,xlab="",ylab="",zlab="",size=6)
+box3d()
+par3d(zoom=1.1)
+axis3d("x--",labels=c("AA","AG","GG"),nticks=3,cex=1.5)
+axis3d("y--",labels=c("CC","CT","TT"),nticks=3, cex=1.5)
+axis3d("z--",labels=c("GG","GT","TT"),nticks=3,cex=1.5)
+title3d(xlab="M1",ylab="M2",zlab="M3",cex=1.5)
+
+```
+
+Three SNPs--live 3D view
+=======================================================
+demo live rotation of data cube
+
+Three SNPs--Second View
+========================================================
+
+Changing rotation alters our interpretation of the data.
+
+Now we see that we could draw 2 principal components that each would capture a fair bit of variance
+
+***
+
+![second view](3D_SNPs_2.png)
+
+Three SNPs--Third View
+========================================================
+
+Changing rotation alters our interpretation of the data.
+
+This rotation shows a third axis of variation.
+
+***
+
+![third view](3D_SNPs_3.png)
+
+PCA Summary
+=======================================================
+incremental:true
+
+* Genomics data is typically highly dimensional.
+* There is often redundancy in the data.
+* PCA allows rotation and rescaling of the data so that we can focus on a smaller set of variables that contain the majority of the information.
+* PCA enables 2D visualization of multi-dimensional datasets (for example by plotting the first and second PCs against one another).
+
+PCA vs MDS
+=======================================================
+
+A related technique is multi-dimensional scaling (MDS).
+
+* In PCA the final number of components is the same as the starting number of dimensions, but the information has been shifted towards a fewer number of dimensions.
+* In MDS the data is rescaled and rotated to project it into a fixed number of dimensions (typically 2).  
+
+MDS
+========================================================
+
+Determines the optimal projection to display the data in 2D
+
+### poor rotation
+![poor rotation](3D_SNPs_1.png) 
+
+MDS
+========================================================
+
+Determines the optimal projection to display the data in 2D
+
+### good rotation
+![good rotation](3D_SNPs_3.png)

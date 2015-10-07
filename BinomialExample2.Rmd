@@ -1,0 +1,82 @@
+---
+title: "Maximum Likelihood Estimation, redux"
+author: "Julin Maloof"
+date: "October 7, 2015"
+output: html_document
+---
+
+The example I gave of Maximum Likelihood Estimation (MLE) in class on Tuesday may have been so simple that it was confusing.  I am going to give a slightly more complex example.
+
+## Goal
+
+The goal of MLE is to determine the best value of some unknown parameter based on observed data.
+
+For example, if we have observed a certain set of progeny genotypes, but we don't know the parental allele frequency we can use MLE to determine the parental allele frequency that _maximizes the likelihood of the observed data_.
+
+## Example
+
+We are assaying a C/T SNP.  We examine 4 progeny and find that three are het and one is homozygous TT.  _What is the most likely parental allele frequency?_
+
+Let p = the frequency of C in the parental population and q = (1-p) = the frequency of T
+
+We determine the likelihood of the observations for different values of C. To do this we need to calculate the probabiliy of each possible way of obtaining 3 hets and one TT. The possible ways to get these are:
+
+  TT Last   |   TT third  | TT second   | TT First 
+------------|-------------|-------------|------------
+CT CT CT TT | CT CT TT CT | CT TT CT CT | TT CT CT CT
+CT CT TC TT | CT CT TT TC | CT TT CT TC | TT CT CT TC
+CT TC CT TT | CT TC TT CT | CT TT TC CT | TT CT TC CT
+TC CT CT TT | TC CT TT CT | TC TT CT CT | TT TC CT CT
+CT TC TC TT | CT TC TT TC | CT TT TC TC | TT CT TC TC
+TC CT TC TT | TC CT TT TC | TC TT CT TC | TT TC CT TC
+TC TC CT TT | TC TC TT CT | TC TT TC CT | TT TC TC CT
+TC TC TC TT | TC TC TT TC | TC TT TC TC | TT TC TC TC
+
+The likelihood of obtaining the first one, CT CT CT TT is: 
+
+$$ p * q * p * q * p * q * q * q = $$
+$$ p ^ 3 * q ^ 5 = $$
+$$ p ^ 3 * (1-p) ^ 5 $$
+
+The same calculation would apply to the likelihood of each of them.  So the likelihood of obtaining 3 hets and 1 TT homozygous by any of the 32 above paths for a given p and q is:
+
+$$ 32 * p ^ 3 * q ^ 5 $$
+
+If C was 0.4 the likelihood of observing this data is:
+
+$$ 32 * 0.4 ^ 3 * 0.6 ^ 5 = 0.1592525 $$
+
+For C of 0.5 the likelihood is:
+
+$$ 32 * 0.5 ^ 3 * 0.5 ^ 5 = 0.125 $$
+
+To determine the MLE we try many possibility for p.  I include the code in case you are an R geek (BIS180L Students this means you), otherwise you can ignore the code and just check out the plot:
+
+```{r }
+#first create a function to compute the likelihood for a given p
+lik.func <- function(p) {
+  32 * p ^ 3 * (1-p) ^ 5
+}
+
+#test it.  It should give the same output as above
+lik.func(p=0.4)
+
+#create a range of values for p
+p <- seq(from=0, to = 1, by = 0.001)
+L <- lik.func(p)
+
+plot(x=p,y=L,type="l",ylab="Likelihood", xlab = "allele frequency: p")
+
+#the maximum likelihood is at an allele frequency of
+p[L==max(L)]
+
+#Note: R contains built-in functions to find the minimum or maximum of a function
+#So we could have written:
+
+optimize(lik.func,interval=c(0,1),maximum=TRUE)
+```
+
+OK yes this example is still too simple because the MLE turns out to be the same as the observed allele frequency of C (3/8).  But trust me, there are plenty of cases where there is no simple mathematical solution and the answer must be obtained by MLE or related methods.
+
+
+
