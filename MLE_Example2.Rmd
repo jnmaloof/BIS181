@@ -2,7 +2,7 @@
 title: "Maximum Likelihood Estimation, redux"
 author: "Julin Maloof"
 date: "October 7, 2015"
-output: html_document
+output: pdf_document
 ---
 
 The example I gave of Maximum Likelihood Estimation (MLE) in class on Tuesday may have been so simple that it was confusing.  I am going to give a slightly more complex example.
