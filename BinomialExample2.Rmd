@@ -50,7 +50,7 @@ For C of 0.5 the likelihood is:
 
 $$ 32 * 0.5 ^ 3 * 0.5 ^ 5 = 0.125 $$
 
-To determine the MLE we try many possibility for p.  I include the code in case you are an R geek (BIS180L Students this means you), otherwise you can ignore the code and just check out the plot:
+To determine the MLE we try many possibilities for p.  I include the code in case you are an R geek (BIS180L Students this means you), otherwise you can ignore the code and just check out the plot:
 
 ```{r }
 #first create a function to compute the likelihood for a given p
@@ -75,6 +75,8 @@ p[L==max(L)]
 
 optimize(lik.func,interval=c(0,1),maximum=TRUE)
 ```
+
+Which tells us the p that gives the highest value is 0.3750005, which has the likelihood of 0.1609325.
 
 OK yes this example is still too simple because the MLE turns out to be the same as the observed allele frequency of C (3/8).  But trust me, there are plenty of cases where there is no simple mathematical solution and the answer must be obtained by MLE or related methods.
 
