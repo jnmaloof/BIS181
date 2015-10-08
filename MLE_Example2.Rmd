@@ -19,9 +19,9 @@ We are assaying a C/T SNP.  We examine 4 progeny and find that three are het and
 
 Let p = the frequency of C in the parental population and q = (1-p) = the frequency of T
 
-We determine the likelihood of the observations for different values of C. To do this we need to calculate the probabiliy of each possible way of obtaining 3 hets and one TT. The possible ways to get these are:
+We determine the likelihood of the observations for different values of C. To do this we need to calculate the probabiliy of each possible way of obtaining 3 hets and one TT. The 32 possible ways to obtain 3 hets and one TT are:
 
-  TT Last   |   TT third  | TT second   | TT First 
+8 with TT last | 8 with TT third | 8 with TT second | 8 with TT first 
 ------------|-------------|-------------|------------
 CT CT CT TT | CT CT TT CT | CT TT CT CT | TT CT CT CT
 CT CT TC TT | CT CT TT TC | CT TT CT TC | TT CT CT TC
